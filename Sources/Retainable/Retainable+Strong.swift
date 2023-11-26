@@ -9,299 +9,102 @@
 
 public extension Retainable {
     
-    /// void to void function
-    func strong(
-        _ function: @escaping VoidVoidFunctionGetter,
+    /// n-input to void function
+    func strong<each Input>(
+        _ function: @escaping InputVoidFunctionGetter<repeat each Input>,
         defer deferring: VoidVoidFunction? = nil
-    ) -> VoidVoidFunction {
+    ) -> InputVoidFunction<repeat each Input> {
         {
+            (item: repeat each Input) in
             
             defer { deferring?() }
             
-            function(self)()
+            let realFunction = function(self)
+            
+            realFunction(repeat each item)
         }
     }
     
-    /// input to void function
-    func strong<Input>(
-        _ function: @escaping InputVoidFunctionGetter<Input>,
+    /// n-1 input to void function
+    func strong<Context, each Input>(
+        capture: Context,
+        _ function: @escaping InputVoidFunctionGetter<Context, repeat each Input>,
         defer deferring: VoidVoidFunction? = nil
-    ) -> InputVoidFunction<Input> {
+    ) -> InputVoidFunction<repeat each Input> {
         {
-            input in
+            (item: repeat each Input) in
             
             defer { deferring?() }
             
-            function(self)(input)
+            function(self)(capture, repeat each item)
         }
     }
     
-    /// 1x input to void/void function
-    func strong<Input>(
-        _ function: @escaping InputVoidFunctionGetter<Input>,
-        append input: Input,
+    /// n-input to output function
+    func strong<each Input, Output>(
+        _ function: @escaping InputOutputFunctionGetter<repeat each Input, Output>,
         defer deferring: VoidVoidFunction? = nil
-    ) -> VoidVoidFunction {
+    ) -> InputOutputFunction<repeat each Input, Output> {
         {
+            (item: repeat each Input) in
             
             defer { deferring?() }
             
-            function(self)(input)
+            return function(self)(repeat each item)
         }
     }
     
-    /// 1x input to void/output function
-    func strong<Input, Output>(
-        _ function: @escaping InputOutputFunctionGetter<Input, Output>,
-        append input: Input,
+    /// n-1 input to output function
+    func strong<Context, each Input, Output>(
+        capture: Context,
+        _ function: @escaping InputOutputFunctionGetter<Context, repeat each Input, Output>,
         defer deferring: VoidVoidFunction? = nil
-    ) -> VoidOutputFunction<Output> {
+    ) -> InputOutputFunction<repeat each Input, Output> {
         {
+            (item: repeat each Input) in
             
             defer { deferring?() }
             
-            return function(self)(input)
+            return function(self)(capture, repeat each item)
         }
     }
     
-    /// 2x input to void function
-    func strong<InputA, InputB>(
-        _ function: @escaping InputInputVoidFunctionGetter<InputA, InputB>,
+    /// n-input to void keypath
+    func strong<each Input>(
+        _ path: repeat ReferenceWritableKeyPath<Self, each Input>,
         defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputVoidFunction<InputA, InputB> {
+    ) -> InputVoidFunction<repeat each Input> {
         {
-            inputA, inputB in
+            (input: repeat each Input) in
             
             defer { deferring?() }
             
-            function(self)(inputA, inputB)
+            repeat self[keyPath: each path] = each input
         }
     }
     
-    /// 2x input to input/void function
-    func strong<InputA, InputB>(
-        _ function: @escaping InputInputVoidFunctionGetter<InputA, InputB>,
-        append inputB: InputB,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputVoidFunction<InputA> {
-        {
-            inputA in
-            
-            defer { deferring?() }
-            
-            function(self)(inputA, inputB)
-        }
-    }
-    
-    /// 3x input to void function
-    func strong<InputA, InputB, InputC>(
-        _ function: @escaping InputInputInputVoidFunctionGetter<InputA, InputB, InputC>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputInputVoidFunction<InputA, InputB, InputC> {
-        {
-            inputA, inputB, inputC in
-            
-            defer { deferring?() }
-            
-            function(self)(inputA, inputB, inputC)
-        }
-    }
-    
-    /// 3x input to 2x input/void function
-    func strong<InputA, InputB, InputC>(
-        _ function: @escaping InputInputInputVoidFunctionGetter<InputA, InputB, InputC>,
-        append inputC: InputC,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputVoidFunction<InputA, InputB> {
-        {
-            inputA, inputB in
-            
-            defer { deferring?() }
-            
-            function(self)(inputA, inputB, inputC)
-        }
-    }
-    
-    /// 4x input to void function
-    func strong<InputA, InputB, InputC, InputD>(
-        _ function: @escaping InputInputInputInputVoidFunctionGetter<InputA, InputB, InputC, InputD>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputInputInputVoidFunction<InputA, InputB, InputC, InputD> {
-        {
-            inputA, inputB, inputC, inputD in
-            
-            defer { deferring?() }
-            
-            function(self)(inputA, inputB, inputC, inputD)
-        }
-    }
-    
-    /// 4x input to 3x input/void function
-    func strong<InputA, InputB, InputC, InputD>(
-        _ function: @escaping InputInputInputInputVoidFunctionGetter<InputA, InputB, InputC, InputD>,
-        append inputD: InputD,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputInputVoidFunction<InputA, InputB, InputC> {
-        {
-            inputA, inputB, inputC in
-            
-            defer { deferring?() }
-            
-            function(self)(inputA, inputB, inputC, inputD)
-        }
-    }
-    
-    /// void to output function
-    func strong<Output>(
-        _ function: @escaping VoidOutputFunctionGetter<Output>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> VoidOutputFunction<Output> {
-        {
-            
-            defer { deferring?() }
-            
-            return function(self)()
-        }
-    }
-    
-    /// input to output function
-    func strong<Input, Output>(
-        _ function: @escaping InputOutputFunctionGetter<Input, Output>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputOutputFunction<Input, Output> {
-        {
-            input in
-            
-            defer { deferring?() }
-            
-            return function(self)(input)
-        }
-    }
-    
-    /// 2x input to output function
-    func strong<InputA, InputB, Output>(
-        _ function: @escaping InputInputOutputFunctionGetter<InputA, InputB, Output>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputOutputFunction<InputA, InputB, Output> {
-        {
-            inputA, inputB in
-            
-            defer { deferring?() }
-            
-            return function(self)(inputA, inputB)
-        }
-    }
-    
-    /// 2x input to input/output function
-    func strong<InputA, InputB, Output>(
-        _ function: @escaping InputInputOutputFunctionGetter<InputA, InputB, Output>,
-        append inputB: InputB,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputOutputFunction<InputA, Output> {
-        {
-            inputA in
-            
-            defer { deferring?() }
-            
-            return function(self)(inputA, inputB)
-        }
-    }
-    
-    /// 3x input to output function
-    func strong<InputA, InputB, InputC, Output>(
-        _ function: @escaping InputInputInputOutputFunctionGetter<InputA, InputB, InputC, Output>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputInputOutputFunction<InputA, InputB, InputC, Output> {
-        {
-            inputA, inputB, inputC in
-            
-            defer { deferring?() }
-            
-            return function(self)(inputA, inputB, inputC)
-        }
-    }
-    
-    /// 3x input to 2x input/output function
-    func strong<InputA, InputB, InputC, Output>(
-        _ function: @escaping InputInputInputOutputFunctionGetter<InputA, InputB, InputC, Output>,
-        append inputC: InputC,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputOutputFunction<InputA, InputB, Output> {
-        {
-            inputA, inputB in
-            
-            defer { deferring?() }
-            
-            return function(self)(inputA, inputB, inputC)
-        }
-    }
-    
-    /// 4x input to output function
-    func strong<InputA, InputB, InputC, InputD, Output>(
-        _ function: @escaping InputInputInputInputOutputFunctionGetter<InputA, InputB, InputC, InputD, Output>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputInputInputOutputFunction<InputA, InputB, InputC, InputD, Output> {
-        {
-            inputA, inputB, inputC, inputD in
-            
-            defer { deferring?() }
-            
-            return function(self)(inputA, inputB, inputC, inputD)
-        }
-    }
-    
-    /// 4x input to 3x input/output function
-    func strong<InputA, InputB, InputC, InputD, Output>(
-        _ function: @escaping InputInputInputInputOutputFunctionGetter<InputA, InputB, InputC, InputD, Output>,
-        append inputD: InputD,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputInputInputOutputFunction<InputA, InputB, InputC, Output> {
-        {
-            inputA, inputB, inputC in
-            
-            defer { deferring?() }
-            
-            return function(self)(inputA, inputB, inputC, inputD)
-        }
-    }
-    
-    /// input to void keypath
-    func strong<Input>(
-        _ path: ReferenceWritableKeyPath<Self, Input>,
-        defer deferring: VoidVoidFunction? = nil
-    ) -> InputVoidFunction<Input> {
-        {
-            input in
-            
-            defer { deferring?() }
-            
-            self[keyPath: path] = input
-        }
-    }
-    
-    /// void to void keypath
-    func strong<Input>(
-        _ path: ReferenceWritableKeyPath<Self, Input>,
-        set value: Input,
+    /// n-input to void keypath
+    func strong<each Input>(
+        _ path: repeat ReferenceWritableKeyPath<Self, each Input>,
+        set value: repeat each Input,
         defer deferring: VoidVoidFunction? = nil
     ) -> VoidVoidFunction {
         {
             defer { deferring?() }
             
-            self[keyPath: path] = value
+            repeat self[keyPath: each path] = each value
         }
     }
     
-    /// void to output keypath
-    func strong<Output>(
-        _ path: KeyPath<Self, Output>,
+    /// void to n-output keypath
+    func strong<each Output>(
+        _ path: repeat KeyPath<Self, each Output>,
         defer deferring: VoidVoidFunction? = nil
-    ) -> VoidOutputFunction<Output> {
+    ) -> VoidOutputFunction<repeat each Output> {
         {
-            
             defer { deferring?() }
             
-            return self[keyPath: path]
+            return (repeat self[keyPath: each path])
         }
     }
 }
