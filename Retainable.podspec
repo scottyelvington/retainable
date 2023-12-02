@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name         = "Retainable"
-    spec.version      = "0.4.0"
+    spec.version      = "0.5.0"
     spec.summary      = "Retainable, a friendly Swifty way to eliminate closure boilerplate."
     spec.swift_version = '5.9'
     spec.homepage     = "https://github.com/scottyelvington/retainable"
