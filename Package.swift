@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Retainable",
     platforms: [
-        .iOS(.v14),
+        .iOS(.v13),
         .macOS(.v12),
         .tvOS(.v14),
         .visionOS(.v1),
